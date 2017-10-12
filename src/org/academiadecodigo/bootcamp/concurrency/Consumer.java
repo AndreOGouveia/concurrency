@@ -22,6 +22,20 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
 
+        for (int i = 0; i < elementNum; i++) {
+
+            try {
+                synchronized (queue){
+                    queue.poll();
+                    if (queue.getSize()==0) {
+                        System.out.println("Queue left empty");
+                    }
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

@@ -21,7 +21,19 @@ public class Producer implements Runnable {
 
     @Override
     public void run() {
+        for (int i = 0; i < elementNum; i++) {
 
+            try {
+                synchronized (queue) {
+                    queue.offer(i);
+                    if (queue.getSize()==queue.getLimit()){
+                        System.out.println("Queue left full");
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

@@ -1,19 +1,25 @@
 package org.academiadecodigo.bootcamp.concurrency.bqueue;
 
+
+import java.util.ArrayList;
+
+
 /**
  * Blocking Queue
  * @param <T> the type of elements stored by this queue
  */
 public class BQueue<T> {
 
+    private ArrayList<T> queue;
+    private final int limit;
+
     /**
      * Constructs a new queue with a maximum size
      * @param limit the queue size
      */
     public BQueue(int limit) {
-
-        throw new UnsupportedOperationException();
-
+        this.limit = limit;
+        queue = new ArrayList<>();
     }
 
     /**
@@ -21,10 +27,19 @@ public class BQueue<T> {
      * Blocking operation if the queue is full
      * @param data the data to add to the queue
      */
-    public void offer(T data) {
+    public void offer(T data) throws InterruptedException {
 
-        throw new UnsupportedOperationException();
+        synchronized (this){
 
+            while (getSize() == getLimit()) {
+                System.out.println(Thread.currentThread().getName()+ " reports Queue is full");
+                wait();
+            }
+
+            queue.add(0, data);
+            notifyAll();
+            System.out.println(Thread.currentThread().getName() + " offers " + data.toString() +" and Queue size is " + getSize());
+        }
     }
 
     /**
@@ -32,19 +47,33 @@ public class BQueue<T> {
      * Blocking operation if the queue is empty
      * @return the data from the head of the queue
      */
-    public T poll() {
+    public T poll() throws InterruptedException {
 
-        throw new UnsupportedOperationException();
+        synchronized(this){
 
+            while(getSize() == 0){
+                System.out.println(Thread.currentThread().getName()+" reports Queue is empty");
+                wait();
+            }
+
+            T element = queue.remove(getSize()-1);
+
+            notifyAll();
+
+            System.out.println(Thread.currentThread().getName()+" polls " + element.toString()+" and Queue size is " + getSize());
+
+            return element;
+        }
     }
 
     /**
      * Gets the number of elements in the queue
      * @return the number of elements
      */
-    public int getSize() {
-
-        throw new UnsupportedOperationException();
+    public  int getSize() {
+        synchronized (this) {
+            return queue.size();
+        }
 
     }
 
@@ -53,9 +82,7 @@ public class BQueue<T> {
      * @return the maximum number of elements
      */
     public int getLimit() {
-
-        throw new UnsupportedOperationException();
-
+        return this.limit;
     }
 
 }
